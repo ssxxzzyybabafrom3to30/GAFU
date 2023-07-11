@@ -1,7 +1,7 @@
 from util import *
 from graph import *
 
-T = 1
+T = 2000
 
 def get_new_link(cur_edgelist_file):
     graph_data = get_data(cur_edgelist_file)[1]
