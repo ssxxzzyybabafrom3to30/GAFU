@@ -1,7 +1,7 @@
 from util import *
 from graph import *
 
-T = 2000
+T = 1
 
 def get_new_link(cur_edgelist_file):
     graph_data = get_data(cur_edgelist_file)[1]
@@ -27,16 +27,16 @@ def get_new_link(cur_edgelist_file):
             cur_neigh = len(edge_dict[i])
             cur_G = 0
             cur_F = 0
-            for list in edge_dict[i]:
-                cur_G += list[1]*new_F[torch.Tensor.int(list[0])]
-                cur_G /= cur_neigh
-                new_G[i] = cur_G
-                cur_F += torch.abs(list[1]-new_G[torch.Tensor.int(list[0])])
-                cur_F /= (2*cur_neigh)
-                new_F = 1-cur_F
+            for cur_list in edge_dict[i]:
+                cur_G = torch.add(cur_G, torch.mul(F[torch.Tensor.int(cur_list[0])], cur_list[1]))
+                cur_F = torch.add(cur_F, torch.abs(torch.add(torch.neg(G[torch.Tensor.int(cur_list[0])])), cur_list[1]))
         
-                G = new_G
-                F = new_F
+            cur_G = torch.div(cur_G, cur_neigh)
+            cur_F /= torch.div(cur_F, 2*cur_neigh)
+            new_G[i] = cur_G
+            new_F[i] = 1-cur_F
+            G = new_G
+            F = new_F
         t += 1
         if torch.sum(torch.abs(F-new_F))<=1e-3 or torch.sum(torch.abs(G-new_G))<=1e-3 or t>=T:
             break
@@ -52,3 +52,7 @@ def get_new_link(cur_edgelist_file):
                 W_list.append(cur_w)
 
     return E_list, W_list
+
+if __name__ == "__main__":
+    cur_edgelist_file = "output/GF/raw_data/GF.edgelist"
+    print(get_new_link(cur_edgelist_file))
